@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import gymnasium as gym
 
-# TODO: meta loader file
 class CartPoleMetaLoader:
     def __init__(self, num_tasks, seed=0):
         self.num_tasks = num_tasks
@@ -84,11 +83,15 @@ class HighwayMetaLoader:
         env = gym.make("highway-fast-v0")
         config = env.unwrapped.default_config()
         for _ in range(self.num_tasks):
-            lanes_count = np.random.randint(2, 5)
-            vehicles_count = np.random.randint(15, 25)
+            lanes_count = np.random.randint(3, 5)
+            vehicles_count = np.random.randint(20, 30)
+            vehicles_density = np.random.uniform(1, 1.5)
+
             seed = np.random.randint(0, 1000)
             config["lanes_count"] = lanes_count
             config["vehicles_count"] = vehicles_count
+            config["vehicles_density"] = vehicles_density
+
             yield {
                 "config": config, 
                 "seed": seed

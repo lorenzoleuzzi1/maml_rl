@@ -45,12 +45,11 @@ class MAML():
             
             set_env_task(self.env, task)
             state, _ = self.env.reset(seed=task['seed'])
-
             log_probs = []
             rewards = []
             done = truncated = False
 
-            for t in range(self.horizon):
+            for _ in range(self.horizon):
                 state = torch.from_numpy(state.flatten()).float()
                 probs = functional_call(self.policy, (params, buffers), state)
                 action = select_action(probs.detach())

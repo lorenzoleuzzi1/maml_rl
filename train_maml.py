@@ -4,7 +4,6 @@ from maml import MAML
 from utils import plot_maml_training, get_env_dims
 from utils import CartPoleMetaLoader, AcrobotMetaLoader, HighwayMetaLoader
 import argparse
-import numpy as np
 
 AVAILABLE_ENVS = ['cartpole', 'acrobot', 'highway']
 
@@ -93,7 +92,7 @@ if __name__ == "__main__":
         return_threshold = -100
     elif args.env == 'highway':
         env_id = 'highway-fast-v0'
-        return_threshold = 22
+        return_threshold = 20
     
     # Print training information
     print(f"Training MAML on {env_id} with following hyperparameters:")

@@ -6,7 +6,6 @@ from utils import  CartPoleMetaLoader, AcrobotMetaLoader, HighwayMetaLoader
 from policy import PolicyNetwork
 import gymnasium as gym
 import argparse
-import pprint
 
 AVAILABLE_ENVS = ['cartpole', 'acrobot', 'highway']
 
@@ -81,7 +80,7 @@ def main(env_id, lr, num_episodes, seed):
         return_threshold = -100
     elif env_id == 'highway-fast-v0':
         task = HighwayMetaLoader(1, seed).__iter__().__next__()
-        return_threshold = 22
+        return_threshold = 20
     else:
         raise ValueError("Invalid environment id")
 

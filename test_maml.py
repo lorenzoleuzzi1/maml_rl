@@ -25,7 +25,7 @@ def run_reinforce_random_maml_init(env_id, lr, num_episodes, num_tasks, path_che
     else:
         random_init_task_loader = HighwayMetaLoader(num_tasks, seed=seed)
         maml_init_task_loader = HighwayMetaLoader(num_tasks, seed=seed)
-        return_threshold = 22 
+        return_threshold = 20
     
     print("--- Random init ---")
     random_init_returns = []
@@ -87,8 +87,9 @@ def compare_init(experiment_name, num_tasks):
     print(f"Random init: {random_updates_to_complete_mean:.2f} +/- {random_updates_to_complete_std:.2f}")
     print(f"MAML init: {maml_updates_to_complete_mean:.2f} +/- {maml_updates_to_complete_std:.2f}")
 
-def visualize_policy(env_id, path_checkpoint):
-    env = gym.make(env_id)
+def visualize_policy(env_id, path_checkpoint, experiment_name):
+    
+    env = gym.make(env_id, render_mode = 'rgb_array')
     env.reset()
     state_dim, action_dim = get_env_dims(env)
     policy = PolicyNetwork(state_dim, action_dim, 100)
@@ -97,7 +98,7 @@ def visualize_policy(env_id, path_checkpoint):
     frames = []
 
     state, _ = env.reset()
-    frames.append(env.render(mode='rgb_array'))
+    frames.append(env.render())
     done = truncated = False
     while True:
         state = torch.from_numpy(state.flatten()).float()
@@ -105,15 +106,15 @@ def visualize_policy(env_id, path_checkpoint):
         action = torch.argmax(probs).item()
         state, _, done, truncated, _ = env.step(action)
         
-        frames.append(env.render(mode='rgb_array'))
+        frames.append(env.render())
         
         if done or truncated:
             break
     
     # Save the frames as a GIF
-    imageio.mimsave('episode.gif', frames, fps=30)
+    imageio.mimsave(f'policy_visualizations/{experiment_name}_episode.gif', frames, fps=100)
         
-def main(env_id, model_name, run, lr, num_episodes, num_tasks, seed):
+def main(env_id, model_name, run, compare, visualize, lr, num_episodes, num_tasks, seed):
     experiment_name = f'{model_name}_{env_id}'
     path_checkpoint = f'checkpoints/{experiment_name}_model.pth'
 
@@ -123,8 +124,12 @@ def main(env_id, model_name, run, lr, num_episodes, num_tasks, seed):
         # Save data
         np.save(f'data/{experiment_name}_random_init.npy', data_random_init)
         np.save(f'data/{experiment_name}_maml_init.npy', data_maml_init)
+    
+    if compare:
+        compare_init(experiment_name, num_tasks)
 
-    compare_init(experiment_name, num_tasks)
+    if visualize:
+        visualize_policy(env_id, path_checkpoint, experiment_name)
 
 
 if __name__ == "__main__":
@@ -133,7 +138,9 @@ if __name__ == "__main__":
                     description='Test a Model Agnostic Meta Learning for Reinforcement Learning initizalization against a random one.') 
     parser.add_argument('--env', type=str, default='cartpole', help='Environment id')
     parser.add_argument('--model_name', type=str, default='vpg', help='Path to the model checkpoint.')
-    parser.add_argument('--run', type=bool, default=False, help='Run the test or just visualize the results.')
+    parser.add_argument('--run', type=bool, default=False, help='Run the test and store data results.')
+    parser.add_argument('--compare', type=bool, default=False, help='Compare the results of the test.')
+    parser.add_argument('--visualize', type=bool, default=False, help='Visualize the policy.')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
     parser.add_argument('--num_episodes', type=int, default=1000, help='Number of episodes')
     parser.add_argument('--num_tasks', type=int, default=10, help='Batch tasks size')
@@ -158,4 +165,4 @@ if __name__ == "__main__":
     else:
         env_id = 'highway-fast-v0'
     
-    main(env_id, args.model_name, args.run, args.lr, args.num_episodes, args.num_tasks, args.seed)
+    main(env_id, args.model_name, args.run, args.compare, args.visualize, args.lr, args.num_episodes, args.num_tasks, args.seed)
