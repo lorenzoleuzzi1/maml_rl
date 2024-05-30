@@ -144,7 +144,7 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
     parser.add_argument('--num_episodes', type=int, default=1000, help='Number of episodes')
     parser.add_argument('--num_tasks', type=int, default=10, help='Batch tasks size')
-    parser.add_argument('--seed', type=int, default=42, help='Seed')
+    parser.add_argument('--seed', type=int, default=43, help='Seed')
     args = parser.parse_args()
     
     if args.env not in AVAILABLE_ENVS:
